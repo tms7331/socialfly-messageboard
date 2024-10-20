@@ -9,6 +9,11 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@ethsign/sp-sdk": "^0.7.5",
+    "@lit-protocol/auth-helpers": "^6.11.0",
+    "@lit-protocol/constants": "^6.11.0",
+    "@lit-protocol/lit-node-client": "^6.11.0",
+    "@supabase/supabase-js": "^2.45.6",
     "ethers": "^5.7.2",
     "next": "14.2.15",
     "react": "^18",
