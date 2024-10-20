@@ -2,16 +2,12 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { LitNetwork, LIT_RPC } from "@lit-protocol/constants";
-import { LitActionResource, createSiweMessageWithRecaps } from "@lit-protocol/auth-helpers";
-import { LitNodeClient, encryptString } from "@lit-protocol/lit-node-client";
+import { LitActionResource } from "@lit-protocol/auth-helpers";
+import { LitNodeClient } from "@lit-protocol/lit-node-client";
 import {
-    SignProtocolClient,
-    SpMode,
-    EvmChains,
     IndexService,
     decodeOnChainData,
     DataLocationOnChain,
-    chainInfo,
     SchemaItem
 } from "@ethsign/sp-sdk";
 
@@ -31,25 +27,9 @@ interface Message {
     content: string;
 }
 
-
-
 const schemaId_location = "onchain_evm_84532_0x38b";
 const indexing = "socialfly_app_0";
 
-const chain = 'ethereum';
-// const accessControlConditions = [
-//     {
-//         contractAddress: '',
-//         standardContractType: '',
-//         chain,
-//         method: 'eth_getBalance',
-//         parameters: [':userAddress', 'latest'],
-//         returnValueTest: {
-//             comparator: '>=',
-//             value: '0',
-//         },
-//     },
-// ];
 
 // const accessControlConditions = [
 //     {
@@ -112,7 +92,7 @@ export default function MessageBoard() {
     const [timestamp, setTimestamp] = useState(Date.now());
 
     const handleSubmit = async () => {
-        console.log("handleSubmitB...");
+        console.log("handleSubmit...");
         const { error } = await supabase.from('posts').insert([
             {
                 address, location, photo, content, timestamp
@@ -299,20 +279,109 @@ export default function MessageBoard() {
 
     return (
         <div style={{ padding: '20px' }}>
-            <h1>Message Board</h1>
-            <div style={{ marginBottom: '20px' }}>
-                <div>
-                    <label>Content:</label>
+
+
+            <style jsx>{`
+                h1 {
+                    font-size: 2.5rem;
+                    color: #333;
+                    text-align: center;
+                    margin-bottom: 30px;
+                    font-family: 'Arial', sans-serif;
+                }
+                .message-board {
+                    max-width: 800px;
+                    margin: 0 auto;
+                    background-color: #f9f9f9;
+                    border-radius: 8px;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                    padding: 20px;
+                }
+                .post-form {
+                    margin-bottom: 30px;
+                }
+                .post-form textarea {
+                    width: 100%;
+                    padding: 10px;
+                    border: 1px solid #ddd;
+                    border-radius: 4px;
+                    resize: vertical;
+                    min-height: 100px;
+                }
+                .post-form button {
+                    background-color: #4CAF50;
+                    color: white;
+                    border: none;
+                    padding: 10px 20px;
+                    text-align: center;
+                    text-decoration: none;
+                    display: inline-block;
+                    font-size: 16px;
+                    margin-top: 10px;
+                    cursor: pointer;
+                    border-radius: 4px;
+                    transition: background-color 0.3s;
+                }
+                .post-form button:hover {
+                    background-color: #45a049;
+                }
+                .message-list {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 20px;
+                }
+                .message {
+                    background-color: white;
+                    border-radius: 8px;
+                    padding: 15px;
+                    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+                }
+                .message-header {
+                    display: flex;
+                    align-items: center;
+                    margin-bottom: 10px;
+                }
+                .message-header img {
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 50%;
+                    margin-right: 10px;
+                    object-fit: cover;
+                }
+                .message-header strong {
+                    font-size: 0.9rem;
+                    color: #555;
+                }
+                .message-content {
+                    font-size: 1rem;
+                    color: #333;
+                    line-height: 1.4;
+                }
+            `}</style>
+
+            <div className="flex flex-col items-center mb-5 p-4 border rounded-md shadow-md w-full max-w-md mx-auto bg-white">
+                <h1 className="text-2xl font-bold text-blue-600 mb-5">Socialfly Message Board</h1>
+                <div className="w-full mb-4">
+                    <label className="block text-gray-700 text-sm font-bold mb-2">Post Content:</label>
                     <textarea
+                        className="w-full p-2 border rounded-md bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
                         required
                     />
                 </div>
-                <div>
-                    <button onClick={handleSubmit}>Add Post</button>
+                <div className="w-full">
+                    <button
+                        onClick={handleSubmit}
+                        className="w-full py-2 px-4 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 transition duration-300"
+                    >
+                        Add Post
+                    </button>
                 </div>
             </div>
+
+
+
 
             <div>
                 {messages.map((message, index) => (
