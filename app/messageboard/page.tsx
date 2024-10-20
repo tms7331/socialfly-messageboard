@@ -31,11 +31,66 @@ interface Message {
     content: string;
 }
 
-interface User {
-    id?: string;
-    username: string;
-    profile_image_url: string;
-}
+
+
+const schemaId_location = "onchain_evm_84532_0x38b";
+const indexing = "socialfly_app_0";
+
+const chain = 'ethereum';
+// const accessControlConditions = [
+//     {
+//         contractAddress: '',
+//         standardContractType: '',
+//         chain,
+//         method: 'eth_getBalance',
+//         parameters: [':userAddress', 'latest'],
+//         returnValueTest: {
+//             comparator: '>=',
+//             value: '0',
+//         },
+//     },
+// ];
+
+// const accessControlConditions = [
+//     {
+//         contractAddress: "0x4d2C7E3F9e498EdaCbAa99C613C1b89b9B218877",
+//         standardContractType: "",
+//         chain: "sepolia",
+//         method: "getApprovalOk",
+//         parameters: [":userAddress", "0x4d2C7E3F9e498EdaCbAa99C613C1b89b9B218877", "abcdefg"],
+//         //functionAbi:
+//         //{
+//         //  "type": "function",
+//         //  "name": "getApprovalOk",
+//         //  "stateMutability": "view",
+//         //  "inputs": [{ "name": "caller", "type": "address", "internalType": "address" },
+//         //  { "name": "hardcodedAddress", "type": "address", "internalType": "address" },
+//         //  { "name": "ipfsCid", "type": "string", "internalType": "string" }],
+//         //  "outputs": [{ "name": "", "type": "bool", "internalType": "bool" }]
+//         //},
+//         returnValueTest: {
+//             comparator: '=',
+//             value: 'true'
+//         },
+//     },
+// ];
+
+const accessControlConditions = [
+    {
+        contractAddress: '',
+        standardContractType: '',
+        chain: 'sepolia',
+        method: 'eth_getBalance',
+        parameters: [
+            ':userAddress',
+            'latest'
+        ],
+        returnValueTest: {
+            comparator: '>=',
+            value: '0'
+        }
+    }
+]
 
 const code = `(async () => {
   const resp = await Lit.Actions.decryptAndCombine({
@@ -100,8 +155,6 @@ export default function MessageBoard() {
         const indexingClient = new IndexService("testnet");
         // const att = await indexingClient.queryAttestation(`onchain_evm_${chainId}_${attId}`);
         //const schemaId_full = "onchain_evm_84532_0x300";
-        const schemaId_location = "onchain_evm_84532_0x38b";
-        const indexing = "socialfly_app";
         // const res0 = await indexingClient.querySchema(schemaId_location);
         // console.log(res0);
         const res = await indexingClient.queryAttestationList({
@@ -116,7 +169,6 @@ export default function MessageBoard() {
         // Finally - decrypt data and set our user data
         console.log(res);
         const items = res!.rows;
-        setLocation("55,44");
         // Should only be one, should we assert?
         for (const item of items) {
             console.log(item);
@@ -124,7 +176,9 @@ export default function MessageBoard() {
             console.log(dec)
 
             // Now do lit decode...
-            await fetchData()
+            await fetchData(dec.ciphertext, dec.dataToEncryptHash);
+
+
 
         }
     }
@@ -140,7 +194,7 @@ export default function MessageBoard() {
     });
 
 
-    const fetchData = async () => {
+    const fetchData = async (ciphertext: string, dataToEncryptHash: string) => {
 
         await client.connect();
         // NEXT_PUBLIC_PK
@@ -152,23 +206,9 @@ export default function MessageBoard() {
             new ethers.providers.JsonRpcProvider(LIT_RPC.CHRONICLE_YELLOWSTONE)
         );
 
-        const ciphertext = "pzmZ4DmdRp35cUKO6Cg2xfFWiyXalB5rYzO847Tk/KKYLHVIwQlXy2XgjTzktVg0IHXd9Lg5MWatwmhmqmkEKHfmuwjk+EA3oAg6m4auamsgej88MqYTq5qygvnvDwSausmmk2bqs/bo/TaAYf/og9EC";
-        const dataToEncryptHash = "64ec88ca00b268e5ba1a35678a1b5316d212f4f366b2477232534a8aeca37f3c";
+        // const ciphertext = "pzmZ4DmdRp35cUKO6Cg2xfFWiyXalB5rYzO847Tk/KKYLHVIwQlXy2XgjTzktVg0IHXd9Lg5MWatwmhmqmkEKHfmuwjk+EA3oAg6m4auamsgej88MqYTq5qygvnvDwSausmmk2bqs/bo/TaAYf/og9EC";
+        // const dataToEncryptHash = "64ec88ca00b268e5ba1a35678a1b5316d212f4f366b2477232534a8aeca37f3c";
 
-        const chain = 'ethereum';
-        const accessControlConditions = [
-            {
-                contractAddress: '',
-                standardContractType: '',
-                chain,
-                method: 'eth_getBalance',
-                parameters: [':userAddress', 'latest'],
-                returnValueTest: {
-                    comparator: '>=',
-                    value: '0',
-                },
-            },
-        ];
 
         ///////// session sigs...
 
@@ -221,7 +261,7 @@ export default function MessageBoard() {
             }
         });
         console.log("decrypted content sent from lit action:", res);
-
+        setLocation(res.response as string);
         await client.disconnect();
     }
 

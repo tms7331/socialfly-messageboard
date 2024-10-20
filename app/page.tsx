@@ -14,6 +14,8 @@ import { Chain } from 'wagmi';
 import { publicProvider } from 'wagmi/providers/public';
 import { ethers } from 'ethers';
 
+const CONTRACT_ADDRESS = "0x4d2C7E3F9e498EdaCbAa99C613C1b89b9B218877";
+
 // Manually define the Sepolia chain
 const sepolia: Chain = {
   id: 11155111,
@@ -94,11 +96,10 @@ function SendTransaction() {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = await provider.getSigner();
 
-      const contractAddress = '0xb5445C1Eba3Cf943EA73c36deeca1B7CD947f44D';
       const contractABI = [
         "function setApproval(string ipfsCid, bool value) public",
       ];
-      const contract = new ethers.Contract(contractAddress, contractABI, signer);
+      const contract = new ethers.Contract(CONTRACT_ADDRESS, contractABI, signer);
       const tx = await contract.setApproval("abcd", true);
 
       console.log('Transaction hash:', tx.hash);
@@ -134,23 +135,7 @@ function SendTransaction() {
 
 
 export default function Home() {
-  const [message, setMessage] = useState('');
 
-  const handleJoinApp = async () => {
-    try {
-      // const response = await fetch('/api/check-access');
-      // const data = await response.json();
-      const data = true;
-      if (data) {
-        window.location.href = '/messageboard';
-      } else {
-        setMessage('Access Denied');
-      }
-    } catch (error) {
-      console.error('An error occurred:', error);
-      setMessage('An error occurred. Please try again later.');
-    }
-  };
 
 
   // <div style={{ textAlign: 'center', marginTop: '50px' }}>
